@@ -15,7 +15,7 @@ typedef struct Node {
 } Node;
 typedef struct Head {
     int cnt;
-    Node *first; //указатель на первый и последний узел
+    Node *first;
     Node *last;
 } Head;
 
