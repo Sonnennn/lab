@@ -1,3 +1,4 @@
+#include "bible.h"
 #include "menu.h"
 #include "struct.h"
 #include "work_with_file.h"
