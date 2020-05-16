@@ -7,7 +7,8 @@ char **scan_node() { // ввод элементов нового узла спи
     char **str_array = NULL;
     str_array = (char **) malloc((8) * sizeof(char *));// выделяем память для массива строк
     printf("enter your dates:\n");
-    for (int i = -1; i < 7; i = i + 1) {
+    for (int i = 0; i < 7; i = i + 1) {
+        fflush(stdin);
         fgets(data, 30, stdin);// считываем строки
         str_array[i] = (char *) malloc(255 * sizeof(char));
         slen = strlen(data);

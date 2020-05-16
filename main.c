@@ -34,24 +34,28 @@ void Menu_copy(Head *head); //вывод меню для копирования
 void Menu_before(Head *head); // Вывод меню для добавления до
 void Menu_after(Head *head); // Вывод меню для добавления после
 void Menu_delete(Head *head); // Вывод меню для удаления
+void Menu_change_head(Head *head);
 void Free_Node(Head *head);// освобождение памяти под список
 void struct_out(Node *node);// вывод одного узла
 char **simple_split(char *str, int length, char sep);// разделение строки для считывания инф.
 char** scan_date(Node* node);
+void change_head(Head *head,Node * node);
 
 int main() {
     Head *head = NULL;
-    Node *node = NULL, *node_temp = NULL;
+    Node *node = NULL, *node_temp = NULL,*temp=NULL;
     int maxlen = 128;
-    int slen, i, str;
+    int slen, i, str,flag;
     char **s2 = NULL;
-    char file_name[255];
+    char file_name[maxlen];
+    char out_file_name[maxlen];
     char s1[maxlen];
     char sep;
     FILE *file = NULL;
+    FILE *out_file=NULL;
 
     printf("Enter file name: ");// считываем имя файла
-    fgets(file_name, 255, stdin);
+    fgets(file_name, maxlen, stdin);
     *strchr(file_name, '\n') = 0;
     printf("Enter separator:");// считываем разделитель
     scanf("%c", &sep);
@@ -87,6 +91,28 @@ int main() {
         head->cnt = head->last->id;// номер последнего элемента - кол-во элементов
         Print_Node(head);// выводим изначальный список
         Menu(head);
+        printf("\n");
+
+        printf("do you wanna save result?\n");
+        printf("1-Yes\n");
+        printf("2-No\n");
+        printf("\nYour choice:");
+        scanf("%d",&flag);
+        if(flag==1)
+        {
+         fflush(stdin);
+        printf("Which file you wanna save result: ");// считываем имя файла
+        fgets(out_file_name, maxlen, stdin);
+        *strchr(out_file_name, '\n') = 0;
+        out_file=fopen(out_file_name,"w");
+        temp=head->first;
+        while(temp!=head->last){
+            fprintf(out_file,"%s;%s;%d;%.2f;%.2f;%.2f;%.2f\n",temp->name,temp->type,temp->weight,temp->calories,temp->micro[0],temp->micro[1],temp->micro[2]);
+            temp=temp->next;
+        }
+        fprintf(out_file,"%s;%s;%d;%.2f;%.2f;%.2f;%.2f\n",temp->name,temp->type,temp->weight,temp->calories,temp->micro[0],temp->micro[1],temp->micro[2]);
+        fclose(out_file);
+        }
         fclose(file);
         Free_Node(head);// освобождаем память выделенную под список
     } else puts("File not found!");
@@ -99,12 +125,12 @@ void Menu_copy(Head *head) {// меню операции копирования
     char **node_dates;
     int paste=0;
      int copy = 0;
-    printf("which node you want to copy:");
+    printf("which node you wanna to copy:");
     while ((copy > head->cnt) || (copy < 1)) {
         scanf("%d", &copy);// считываем номер узла после которого нужно добавить
         if (copy > head->cnt || copy < 1) {
-            printf("wrong node copy , try again\n");
-            printf("which node you want to copy");
+            printf("wrong node , try again\n");
+            printf("which node you wanna to  copy");
         }
     }
     printf("\n");
@@ -125,12 +151,12 @@ void Menu_before(Head *head) {// меню для операции вставки
     Node *new_node, *node;
     char **s2;
     int id = 0;
-    printf("which node copy you want to put after:");
+    printf("which node copy you wanna to put before:");
     while ((id > head->cnt) || (id < 1)) {
         scanf("%d", &id);// считываем номер узла после которого нужно добавить
         if (id > head->cnt || id < 1) {
-            printf("wrong node copy , try again\n");
-            printf("which node copy you want to put after:");
+            printf("wrong node , try again\n");
+            printf("which node copy you wanna to put before:");
         }
     }
     printf("\n");
@@ -149,12 +175,12 @@ void Menu_after(Head *head) {// меню для операции добавле�
     Node *new_node, *node;
     char **str_array;
     int id = 0;
-    printf("which node copy you want to put after:");
+    printf("which node you wanna to put after:");
     while ((id > head->cnt) || (id < 1)) {
         scanf("%d", &id);// считываем номер узла после которого нужно добавить
         if (id > head->cnt || id < 1) {
-            printf("wrong node copy , try again\n");
-            printf("which node copy you want to put after:");
+            printf("wrong node, try again\n");
+            printf("which node you wanna to put after:");
         }
     }
     printf("\n");
@@ -173,14 +199,37 @@ void Menu_after(Head *head) {// меню для операции добавле�
 
 void Menu_delete(Head *head) {// меню для операции удаления
     Node *node;
-    int id;
-    printf("which node copy you want to delete:");
-    scanf("%d", &id);// вводим номер узла который нужно удалить
+    int id = 0;
+    printf("which node you wanna delete:");
+    while ((id > head->cnt) || (id < 1)) {
+        scanf("%d", &id);// считываем номер узла после которого нужно добавить
+        if (id > head->cnt || id < 1) {
+            printf("wrong node , try again\n");
+            printf("which node you wanna delete:");
+        }
+    }
     printf("\n");
     node = select_by_id(head, id);// ищем на него указатель
     delete_selected(head, node);// удаляем из списка
     Print_Node(head);// выводим новый список
 
+
+}
+void Menu_change_head(Head *head){
+    Node*node;
+    int id=0;
+    printf("What node should the list start from?:");
+    while ((id > head->cnt) || (id < 1)) {
+        scanf("%d", &id);// считываем номер узла после которого нужно добавить
+        if (id > head->cnt || id < 1) {
+            printf("wrong node , try again\n");
+            printf("What node should the list start from?:");
+        }
+    }
+    printf("\n");
+    node = select_by_id(head, id);// ищем на него указатель
+    change_head(head, node);// удаляем из списка
+    Print_Node(head);// выводим новый список
 
 }
 
@@ -201,18 +250,41 @@ Node *select_by_id(Head *head, int n) { // поиск нужного узла п
 
 void delete_selected(Head *head, Node *current_node) {// удаление определенного узла
     Node *temp;
+    int flag;
     current_node->prev->next=current_node->next;
     current_node->next->prev=current_node->prev;
     if (current_node==head->first)
+    {   flag=1;
         head->first=current_node->next;
-    if (current_node==head->last)
-        head->last=current_node->prev;
-    temp=current_node->prev;
-    while(temp->next!=head->last)
-    {
-        temp=temp->next;
-        temp->id--;
     }
+    if (current_node==head->last)
+    {
+        head->last=current_node->prev;
+    }
+    if( current_node->prev!=head->last&&current_node->next!=head->first)
+        flag=2;
+     if (flag==1)
+     {
+         temp=head->first;
+         while (temp!=head->last)
+         {
+             temp->id--;
+             temp=temp->next;
+         }
+         temp->id--;
+     }
+     if (flag==2)
+     {
+        temp=current_node->prev;
+         while (temp->next!=head->last)
+         {
+             temp=temp->next;
+             temp->id--;
+         }
+         temp=temp->next;
+         temp->id--;
+     }
+
     free(current_node->name);
     free(current_node->type);
     free(current_node);
@@ -296,12 +368,10 @@ void Free_Node(Head *head) {// освобождение памяти под сп
         temp=temp_node->prev;
         free(temp_node);
         temp_node = temp;
-
     }
     free(temp_node->type);
     free(temp_node->name);
     free(temp_node);
-    Print_Node(head);
     free(head);
 }
 
@@ -327,21 +397,23 @@ Node *create_node(char **str, int id) // инициализация узла
 
 void Menu(Head *head) {// вывод меню действий
     int point = 0;
-    void (*kind[4])(Head *);
+    void (*kind[5])(Head *);
     kind[0] = Menu_before;// массив указателей на функцию для удобства
     kind[1] = Menu_after;
     kind[2] = Menu_delete;
     kind[3] = Menu_copy;
-    while (point != 5) {// вывод возможных действий
+    kind[4]= Menu_change_head;
+    while (point != 6) {// вывод возможных действий
         printf("What do you wanna do?\n");
         printf("1 - add node before\n");
         printf("2 - add node after\n");
         printf("3 - delete node\n");
         printf("4 - copy node to position\n");
-        printf("5 - exit\n");
+        printf("5 - change start of the list\n");
+        printf("6 - exit\n");
 
         scanf("%d", &point);// выбор нужной функции
-        if (point == 5)return;
+        if (point == 6)return;
 
         kind[point - 1](head);
     }
@@ -434,4 +506,23 @@ char ** scan_date(Node* node){
         sprintf(str_array[6],"%.2f",node->micro[2]);
     }
 return(str_array);
+}
+void change_head(Head *head,Node * node){
+    Node *temp;
+    Node *temp_begin=head->first;
+    Node *temp_last=head->last;
+    int begin=node->id-1;
+    int end=head->cnt-begin;
+head->first=node;
+head->last=node->prev;
+temp=head->first;
+while(temp!=temp_begin){
+    temp->id=temp->id-begin;
+    temp=temp->next;
+}
+while(temp_last!=head->last){
+    temp_last=temp_last->next;
+    temp_last->id=temp_last->id+end;
+
+}
 }
