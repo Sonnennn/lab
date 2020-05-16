@@ -1,0 +1,12 @@
+meat and fish;chicken;100;110.00;23.09;1.24;0.00
+meat and fish;mutton;100;292.00;24.32;20.77;0.00
+fruits;apple;150;72.00;0.36;0.23;19.06
+vegetables;potatoes;100;104.00;1.66;2.40;19.36
+meat and fish;salmon;100;146.00;21.62;5.93;0.00
+fruits;banana;100;89.00;1.09;0.33;22.84
+nuts;peanut;100;567.00;25.80;49.24;16.13
+vegetables;cucumber;100;15.00;0.67;0.11;3.63
+fruits;mango;100;65.00;0.51;0.27;17.00
+nuts;almond;100;645.00;18.60;57.70;16.20
+beverage;coffee;100;1.00;0.12;0.02;0.04
+fastfood;gamburger;100;253.00;13.00;8.50;30.00
