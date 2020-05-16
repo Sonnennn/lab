@@ -37,6 +37,7 @@ void Menu_delete(Head *head); // Вывод меню для удаления
 void Free_Node(Head *head);// освобождение памяти под список
 void struct_out(Node *node);// вывод одного узла
 char **simple_split(char *str, int length, char sep);// разделение строки для считывания инф.
+char** scan_date(Node* node);
 
 int main() {
     Head *head = NULL;
@@ -94,15 +95,27 @@ int main() {
 
 
 void Menu_copy(Head *head) {// меню операции копирования
-    Node *node;
-    int copy, paste;
-    printf("which node id you want to copy:");
-    scanf("%d", &copy);// считываем номер узла который нужно скопировать
-    node = select_by_id(head, copy);// ищем этот узел
-    printf("which node id you want to paste:");
-    scanf("%d", &paste);// считываем номер куда нужно вставить
+    Node *node,*new_node;
+    char **node_dates;
+    int paste=0;
+     int copy = 0;
+    printf("which node you want to copy:");
+    while ((copy > head->cnt) || (copy < 1)) {
+        scanf("%d", &copy);// считываем номер узла после которого нужно добавить
+        if (copy > head->cnt || copy < 1) {
+            printf("wrong node copy , try again\n");
+            printf("which node you want to copy");
+        }
+    }
     printf("\n");
-    copy_node(head, node, paste);// выполняем копирование и вставку
+    node = select_by_id(head, copy);// ищем этот узел
+    node_dates=scan_date(node);
+    new_node=create_node(node_dates,1);
+    printf("which node you want to paste:");
+    scanf("%d", &paste);// считываем номер узла после которого нужно добавить
+
+    printf("\n");
+    copy_node(head, new_node, paste);// выполняем копирование и вставку
     Print_Node(head);// выводим список
 
 
@@ -112,12 +125,12 @@ void Menu_before(Head *head) {// меню для операции вставки
     Node *new_node, *node;
     char **s2;
     int id = 0;
-    printf("which node id you want to put after:");
+    printf("which node copy you want to put after:");
     while ((id > head->cnt) || (id < 1)) {
         scanf("%d", &id);// считываем номер узла после которого нужно добавить
         if (id > head->cnt || id < 1) {
-            printf("wrong node id , try again\n");
-            printf("which node id you want to put after:");
+            printf("wrong node copy , try again\n");
+            printf("which node copy you want to put after:");
         }
     }
     printf("\n");
@@ -136,12 +149,12 @@ void Menu_after(Head *head) {// меню для операции добавле�
     Node *new_node, *node;
     char **str_array;
     int id = 0;
-    printf("which node id you want to put after:");
+    printf("which node copy you want to put after:");
     while ((id > head->cnt) || (id < 1)) {
         scanf("%d", &id);// считываем номер узла после которого нужно добавить
         if (id > head->cnt || id < 1) {
-            printf("wrong node id , try again\n");
-            printf("which node id you want to put after:");
+            printf("wrong node copy , try again\n");
+            printf("which node copy you want to put after:");
         }
     }
     printf("\n");
@@ -161,7 +174,7 @@ void Menu_after(Head *head) {// меню для операции добавле�
 void Menu_delete(Head *head) {// меню для операции удаления
     Node *node;
     int id;
-    printf("which node id you want to delete:");
+    printf("which node copy you want to delete:");
     scanf("%d", &id);// вводим номер узла который нужно удалить
     printf("\n");
     node = select_by_id(head, id);// ищем на него указатель
@@ -249,60 +262,14 @@ void insert_before(Head *head, Node *new_node, Node *current_node) {// вста�
 
 }
 
-void copy_node(Head *head, Node *current_node, int k) {// копирование данных из одного узла в другой
-    Node *new_temp, *new = NULL;
-
-    if (k == 0) {// если нужно скопировать элемент в начало списка , то
-        new = (Node *) malloc(sizeof(Node));// выделяем память под узел списка
-        new->name = (char *) malloc(30 * sizeof(char));
-        new->type = (char *) malloc(30 * sizeof(char));
-        strcpy(new->name, current_node->name);// копируем все данные с копируемого узла
-        strcpy(new->type, current_node->type);
-        new->calories = current_node->calories;
-        new->weight = current_node->weight;
-        for (int i = 0; i < 3; i++) {
-            new->micro[i] = current_node->micro[i];
-        }
-        new->next = head->first;// указатель на следующий элемент становится прошлый первый
-        head->first = new;
-        new->id = 1;
-        new_temp = head->first;
-        while (new_temp->next != NULL) {// увеличиваем индексы всех элементов списка
-            new_temp = new_temp->next;
-            new_temp->id++;
-        }
-
-    } else {
-        if (k > head->cnt) {// если индекс узла превышает количество элементов в списке , то ставим его в конец
-            new = (Node *) malloc(sizeof(Node));// выделяем память под узел списка
-            new->name = (char *) malloc(30 * sizeof(char));// копируем все данные
-            new->type = (char *) malloc(30 * sizeof(char));
-            strcpy(new->name, current_node->name);
-            strcpy(new->type, current_node->type);
-            new->calories = current_node->calories;
-            new->weight = current_node->weight;
-            for (int i = 0; i < 3; i++) {
-                new->micro[i] = current_node->micro[i];
-            }
-// бывшему последнему элементу ставим указатель на новый элемент
-            head->last->next = new;
-            head->last = new;// обновляем последний элемент головы списка
-            new->id = head->cnt + 1;
-        } else {
-            new_temp = select_by_id(head, k);
-            free(new_temp->type); // если индекс лежит среди элементов списка ,то
-            free(new_temp->name); // то освобождаем ячейки этого узла
-            new_temp->name = (char *) malloc(30 * sizeof(char));// и заносим информацию с копируемого элемента
-            new_temp->type = (char *) malloc(30 * sizeof(char));
-            strcpy(new_temp->name, current_node->name);
-            strcpy(new_temp->type, current_node->type);
-            new_temp->calories = current_node->calories;
-            new_temp->weight = current_node->weight;
-            for (int i = 0; i < 3; i++) {
-                new_temp->micro[i] = current_node->micro[i];
-            }
-        }
-    }
+void copy_node(Head *head, Node *new_node, int k) {// копирование данных из одного узла в другой
+    Node *temp= NULL;
+    if (k>head->cnt){
+        temp=select_by_id(head,k);
+        insert_after(head,new_node,temp);
+    }else{
+    temp=select_by_id(head,k);
+    insert_before(head,new_node,temp);}
     head->cnt++;
 
 }
@@ -329,9 +296,12 @@ void Free_Node(Head *head) {// освобождение памяти под сп
         temp=temp_node->prev;
         free(temp_node);
         temp_node = temp;
+
     }
     free(temp_node->type);
     free(temp_node->name);
+    free(temp_node);
+    Print_Node(head);
     free(head);
 }
 
@@ -401,15 +371,15 @@ char **simple_split(char *str, int length, char sep) { // разделение �
 
     key = 0;
     str_array = (char **) malloc((m + 1) * sizeof(char *));// выделяем память под массив строк
-    if (str_array != NULL) {
-        for (i = 0; i <= m; i++) {
-            str_array[i] = (char *) malloc(length * sizeof(char));
-            if (str_array[i] != NULL) key = 1;// проходим по строке ища знак разделитель
-            else {
-                key = 0;
-                i = m;
+        if (str_array != NULL) {
+            for (i = 0; i <= m; i++) {
+                str_array[i] = (char *) malloc(length * sizeof(char));
+                if (str_array[i] != NULL) key = 1;// проходим по строке ища знак разделитель
+                else {
+                    key = 0;
+                    i = m;
+                }
             }
-        }
         if (key) {
             k = 0;
             m = 0;
@@ -446,3 +416,22 @@ void struct_out(Node *node) { // вывод полей структуры
            node->micro[2]);
 }
 
+char ** scan_date(Node* node){
+
+    int length=100;
+    char **str_array = NULL;
+    str_array = (char **) malloc((7 + 1) * sizeof(char *));// выделяем память под массив строк
+    if (str_array != NULL) {
+        for (int i = 0; i <= 7; i++) {
+            str_array[i] = (char *) malloc(length * sizeof(char));
+        }
+        strcpy(str_array[0],node->name);
+        strcpy(str_array[1],node->type);
+        itoa(node->weight,str_array[2],10);
+        sprintf(str_array[3],"%.2f",node->calories);
+        sprintf(str_array[4],"%.2f",node->micro[0]);
+        sprintf(str_array[5],"%.2f",node->micro[1]);
+        sprintf(str_array[6],"%.2f",node->micro[2]);
+    }
+return(str_array);
+}
