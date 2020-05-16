@@ -65,8 +65,7 @@ int main() {
 // читаем данные из файла и заполняем структуру
         for (i = 1; i < str + 1; i++) {
             fgets(s1, maxlen, file); // берем одну строку
-            slen = strlen(s1);
-            s1[slen - 1] = '\0';
+
             slen = strlen(s1);
             s2 = simple_split(s1, slen, sep); // разбиваем ее на части
             node = create_node(s2, i);// создаем элемент списка
@@ -188,43 +187,22 @@ Node *select_by_id(Head *head, int n) { // поиск нужного узла п
 }
 
 void delete_selected(Head *head, Node *current_node) {// удаление определенного узла
-    Node *node_temp, *temp;
-
-    node_temp = head->first;
-    temp = head->last;
-    if (current_node == node_temp) {// если это первый узел , то
-        head->first = current_node->next;// то первым будет узел после прошлого первого
-        current_node->next = NULL;// освобождаем память под этот узел
-        free(current_node->name);
-        free(current_node->type);
-        current_node->name = NULL;
-        current_node->type = NULL;
-        free(current_node);
-        node_temp = head->first;
-        while (node_temp != NULL) {// проходим по списку уменьшая номера узлов
-            node_temp->id--;
-            node_temp = node_temp->next;
-        }
-
-    } else {
-        while (node_temp != NULL) {// проходим по списку пока не дойдем до нужного
-            if (node_temp->next == current_node) {// если это нужный узел
-                if (current_node == temp) head->last = node_temp;// если это последний то обновляем последний в голове
-                node_temp->next = current_node->next;// предыдущему узлу даем адрес на следующий
-                free(current_node->name);// освобождаем память под этот узел
-                free(current_node->type);
-                current_node->name = NULL;
-                current_node->type = NULL;
-                current_node->next = NULL;
-                free(current_node);
-                while (node_temp->next != NULL) {// проходим дальше по узлам уменьшая их номер
-                    node_temp = node_temp->next;
-                    node_temp->id--;
-
-                }
-            } else node_temp = node_temp->next;
-        }
+    Node *temp;
+    current_node->prev->next=current_node->next;
+    current_node->next->prev=current_node->prev;
+    if (current_node==head->first)
+        head->first=current_node->next;
+    if (current_node==head->last)
+        head->last=current_node->prev;
+    temp=current_node->prev;
+    while(temp->next!=head->last)
+    {
+        temp=temp->next;
+        temp->id--;
     }
+    free(current_node->name);
+    free(current_node->type);
+    free(current_node);
     head->cnt--;
 }
 
@@ -349,6 +327,7 @@ void Free_Node(Head *head) {// освобождение памяти под сп
         free(temp_node->type);
         free(temp_node->name);
         temp=temp_node->prev;
+        free(temp_node);
         temp_node = temp;
     }
     free(temp_node->type);
