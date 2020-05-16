@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "scan.h"
+
 typedef struct Node {
     int id;
     char *name;
@@ -75,13 +76,15 @@ int main() {
             }
             if (i > 1) {
                 node_temp->next = node;// указатель на новый элемент
-                node->prev=node_temp;
+                node->prev = node_temp;
             }
             node_temp = node;// запоминаем указатель на прошлый элемент
 
         }
         head->last = node;// заносим последний элемент в Head
-        head->cnt = node->id;// номер последнего элемента - кол-во элементов
+        head->last->next = head->first;
+        head->first->prev = head->last;
+        head->cnt = head->last->id;// номер последнего элемента - кол-во элементов
         Print_Node(head);// выводим изначальный список
         Menu(head);
         fclose(file);
@@ -109,9 +112,16 @@ void Menu_copy(Head *head) {// меню операции копирования
 void Menu_before(Head *head) {// меню для операции вставки до
     Node *new_node, *node;
     char **s2;
-    int id;
-    printf("which node id you want to put before:");
-    scanf("%d", &id);// считываем номер узла до которого нудно вставить
+    int id = 0;
+    printf("which node id you want to put after:");
+    while ((id > head->cnt) || (id < 1)) {
+        scanf("%d", &id);// считываем номер узла после которого нужно добавить
+        if (id > head->cnt || id < 1) {
+            printf("wrong node id , try again\n");
+            printf("which node id you want to put after:");
+        }
+    }
+    printf("\n");
     s2 = scan_node();// считываем информацию для нового узла
     new_node = create_node(s2, 1);// создаем узел
     printf("Your new node:\n");
@@ -126,9 +136,16 @@ void Menu_before(Head *head) {// меню для операции вставки
 void Menu_after(Head *head) {// меню для операции добавление после
     Node *new_node, *node;
     char **str_array;
-    int id;
+    int id = 0;
     printf("which node id you want to put after:");
-    scanf("%d", &id);// считываем номер узла после которого нужно добавить
+    while ((id > head->cnt) || (id < 1)) {
+        scanf("%d", &id);// считываем номер узла после которого нужно добавить
+        if (id > head->cnt || id < 1) {
+            printf("wrong node id , try again\n");
+            printf("which node id you want to put after:");
+        }
+    }
+    printf("\n");
     str_array = scan_node();// вводим информации для узла
     new_node = create_node(str_array, 1);// создаем узел
     printf("Your new node:\n");
@@ -164,7 +181,8 @@ Node *select_by_id(Head *head, int n) { // поиск нужного узла п
     if (n > k) n = k;
     if (n == 0) n = 1;
     if ((n > 0) && (n <= k)) {// проходим по списку пока не дойдем до нужного номера
-        while ((node->id) != n) node = node->next;
+        while ((node->id) != n)
+            node = node->next;
     } else node = NULL;
     return node;// возвращаем указатель на этот узел
 }
@@ -212,57 +230,45 @@ void delete_selected(Head *head, Node *current_node) {// удаление опр
 
 void insert_after(Head *head, Node *new_node, Node *current_node) {// вставка узла после текущего
     Node *node_temp;
-    int n;
     if (head && new_node && current_node) {
-        n = head->cnt + 1;
-        if (current_node == head->last) {// если это последний узел
-            current_node->next = new_node;// в указатель последнего на следующий заносим наш узел
-            head->last = new_node;// обновляем последний узел в голове
-            new_node->id = head->cnt + 1;
-        } else {
-            new_node->next = current_node->next;// указатель на следующий теперь заносим в ша узел
-            new_node->id = current_node->id + 1;// увеличиваем номер узла
-            current_node->next = new_node;// в узел до заносим адрес нашего узла
-            node_temp = new_node;
-            while (node_temp->next != NULL) {// проходим по списку увеличивая номера узлов
-                node_temp = node_temp->next;
-                node_temp->id++;
+        new_node->next = current_node->next;
+        new_node->prev = current_node;
+        current_node->next = new_node;
+        new_node->next->prev = new_node;
+        if (current_node == head->last){
+            head->last = new_node;}
+        new_node->id = current_node->id + 1;
+        node_temp = new_node;
+        while (node_temp->next != head->first) {// проходим по списку увеличивая номера узлов
+            node_temp = node_temp->next;
+            node_temp->id++;
 
-            }
         }
-
-        head->cnt = n;
+        head->cnt++;
     }
+
 }
 
-void insert_before(Head *head, Node *new_node, Node *current_node) {// вставка узла перед определенным элементом
-    Node *node_temp = NULL;
-    Node *temp = NULL;
-    int n;
 
+void insert_before(Head *head, Node *new_node, Node *current_node) {// вставка узла перед определенным элементом
+    Node *node_temp;
     if (head && new_node && current_node) {
-        if (head->first == current_node) {// если это первый узел
-            n = head->cnt + 1;
-            new_node->id = 1;
-            new_node->next = current_node;// в новый узел заносим указатель на первый
-            head->first = new_node;// в голове указатель на первый = новому узлу
-            head->cnt = n;
-            node_temp = head->first;
-            while (node_temp->next != NULL) {// увеличиваем адреса узлов списка
-                node_temp = node_temp->next;
-                node_temp->id++;
-            }
-        } else {
-            node_temp = head->first;
-            while (node_temp != NULL) {// проходим по списку
-                if (node_temp->next == current_node) {// если следующий узел наш
-                    temp = node_temp;
-                    insert_after(head, new_node, temp);// то вставляем узел на место нынешнего узла
-                    node_temp = NULL;
-                } else node_temp = node_temp->next;
-            }
+        new_node->prev = current_node->prev;
+        new_node->next = current_node;
+        current_node->prev = new_node;
+        new_node->prev->next = new_node;
+        if (current_node == head->first)
+            head->first = new_node;
+        new_node->id = current_node->id;
+        node_temp = new_node;
+        while (node_temp->next != head->first) {// проходим по списку увеличивая номера узлов
+            node_temp = node_temp->next;
+            node_temp->id++;
+
         }
+        head->cnt++;
     }
+
 }
 
 void copy_node(Head *head, Node *current_node, int k) {// копирование данных из одного узла в другой
@@ -327,26 +333,26 @@ void Print_Node(Head *head) {// вывод списка
     print_header();
     Node *node = NULL;
     node = head->first;
-    while (node != NULL) {// проход по списку с головы выводя каждый узел
+    while (node != head->last) {// проход по списку с головы выводя каждый узел
         struct_out(node);
         node = node->next;
     }
+    struct_out(head->last);
     printf("\n");
 }
 
 void Free_Node(Head *head) {// освобождение памяти под список
-    Node *p1 = NULL;
-    Node *p = NULL;
-    p = head->first;
-    while (p != NULL) {// проходим по списку и освобождаем память пока не дойдем до конца
-        p1 = p->next;
-        free(p->name);
-        free(p->type);
-        p->name = NULL;
-        p->type = NULL;
-        free(p);
-        p = p1;
+    Node *temp_node = NULL;
+    Node *temp=NULL;
+    temp_node = head->last;
+    while (temp_node!= head->first) {// проходим по списку и освобождаем память пока не дойдем до конца
+        free(temp_node->type);
+        free(temp_node->name);
+        temp=temp_node->prev;
+        temp_node = temp;
     }
+    free(temp_node->type);
+    free(temp_node->name);
     free(head);
 }
 
@@ -363,12 +369,11 @@ Node *create_node(char **str, int id) // инициализация узла
     new_node->micro[1] = atof(str[5]);
     new_node->micro[2] = atof(str[6]);
     new_node->next = NULL;
-    new_node->prev=NULL;
+    new_node->prev = NULL;
 
 
     return new_node; // возвращаем адрес узла
 }
-
 
 
 void Menu(Head *head) {// вывод меню действий
