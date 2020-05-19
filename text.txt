@@ -9,4 +9,4 @@ vegetables;cucumber;100;15.00;0.67;0.11;3.63
 fruits;mango;100;65.00;0.51;0.27;17.00
 nuts;almond;100;645.00;18.60;57.70;16.20
 beverage;coffee;100;1.00;0.12;0.02;0.04
-fastfood;gamburger;100;253.00;13.00;8.50;30.00
+fastfood;hamburger;100;253.00;13.00;8.50;30.00
