@@ -1,16 +1,15 @@
 #include "bible.h"
-#include "output.h"
 #include "struct.h"
 
 void print_header() { // вывод разметки таблицы
-    printf("| %2s|%15s | %8s | %6s| %9s | %4s | %4s | %4s |\n", "Id", "Section", "Product", "Weight(g)", "Calories",
+    printf("| %2s|%15s | %9s | %6s| %9s | %4s | %4s | %4s |\n", "Id", "Section", "Product", "Weight(g)", "Calories",
            "Protein",
            " Fat ", "Carbohydrates");
-    printf("+---+----------------+----------+----------+-----------+---------+-------+---------------+\n");
+    printf("+---+----------------+-----------+----------+-----------+---------+-------+---------------+\n");
 }
 
 void struct_out(Node *node) { // вывод полей структуры
-    printf("| %2d|%15s | %8s |%9d | %9.2f | %7.2f | %5.2f | %13.2f |\n",
+    printf("| %2d|%15s | %9s |%9d | %9.2f | %7.2f | %5.2f | %13.2f |\n",
            node->id, node->name, node->type, node->weight, node->calories, node->micro[0],
            node->micro[1],
            node->micro[2]);

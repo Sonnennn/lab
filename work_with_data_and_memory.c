@@ -2,6 +2,7 @@
 
 #include "bible.h"
 #include "struct.h"
+
 Head *make_head() {// создание головы списка
     Head *head = NULL;
 
@@ -13,6 +14,7 @@ Head *make_head() {// создание головы списка
     }
     return head;
 }
+
 char **scan_node() { // ввод элементов нового узла списка
     int slen;// длина строки
     char data[30];// массив для ввода информации с строки
@@ -35,12 +37,12 @@ char **scan_node() { // ввод элементов нового узла спи
 
 void Free_Node(Head *head) {// освобождение памяти под список
     Node *temp_node = NULL;
-    Node *temp=NULL;
+    Node *temp = NULL;
     temp_node = head->last;
-    while (temp_node!= head->first) {// проходим по списку и освобождаем память пока не дойдем до конца
+    while (temp_node != head->first) {// проходим по списку и освобождаем память пока не дойдем до конца
         free(temp_node->type);
         free(temp_node->name);
-        temp=temp_node->prev;
+        temp = temp_node->prev;
         free(temp_node);
         temp_node = temp;
     }
@@ -49,6 +51,7 @@ void Free_Node(Head *head) {// освобождение памяти под сп
     free(temp_node);
     free(head);
 }
+
 Node *create_node(char **str, int id) // инициализация узла
 {
     Node *new_node = NULL; // выделяем память под узел и заполняем его и массива строк
@@ -104,23 +107,24 @@ char **simple_split(char *str, int length, char sep) { // разделение �
     str_array[m][j - k] = '\0';
     return str_array;// возвращаем указатель на массив строк
 }
-char ** scan_date(Node* node){
 
-    int length=100;
+char **scan_date(Node *node) {//создает массив строк с данными переданного узла
+
+    int length = 100;
     char **str_array = NULL;
     str_array = (char **) malloc((7 + 1) * sizeof(char *));// выделяем память под массив строк
     if (str_array != NULL) {
         for (int i = 0; i <= 7; i++) {
-            str_array[i] = (char *) malloc(length * sizeof(char));
+            str_array[i] = (char *) malloc(length * sizeof(char));// выделяет память под сами строки
         }
-        strcpy(str_array[0],node->name);
-        strcpy(str_array[1],node->type);
-        itoa(node->weight,str_array[2],10);
-        sprintf(str_array[3],"%.2f",node->calories);
-        sprintf(str_array[4],"%.2f",node->micro[0]);
-        sprintf(str_array[5],"%.2f",node->micro[1]);
-        sprintf(str_array[6],"%.2f",node->micro[2]);
+        strcpy(str_array[0], node->name);// заполняет сами строки данными из полей узла
+        strcpy(str_array[1], node->type);
+        itoa(node->weight, str_array[2], 10);
+        sprintf(str_array[3], "%.2f", node->calories);
+        sprintf(str_array[4], "%.2f", node->micro[0]);
+        sprintf(str_array[5], "%.2f", node->micro[1]);
+        sprintf(str_array[6], "%.2f", node->micro[2]);
     }
-    return(str_array);
+    return (str_array);
 }
 

@@ -1,7 +1,8 @@
 #include "bible.h"
 #include "struct.h"
 #include "work_with_data_and_memory.h"
-Head *read_from_file() {
+
+Head *read_from_file() {// создание списка данных из файла
     Head *head = NULL;
     Node *node = NULL, *node_temp = NULL;
     int maxlen = 128;
@@ -50,32 +51,34 @@ Head *read_from_file() {
     } else puts("File not found!");
     return (head);
 }
-void out_to_file(Head *head){
+
+void out_to_file(Head *head) {// запись списка в файл
     int flag;
-    Node *temp=NULL;
+    Node *temp = NULL;
     int maxlen = 128;
-    FILE *out_file=NULL;
+    FILE *out_file = NULL;
     char out_file_name[maxlen];
     printf("\n");
 
-    printf("do you wanna save result?\n");
+    printf("do you wanna save result?\n");// спрашиваем хочет ли сохрвнить
     printf("1-Yes\n");
     printf("2-No\n");
     printf("\nYour choice:");
-    scanf("%d",&flag);
-    if(flag==1)
-    {
+    scanf("%d", &flag);
+    if (flag == 1) {
         fflush(stdin);
         printf("Which file you wanna save result: ");// считываем имя файла
         fgets(out_file_name, maxlen, stdin);
         *strchr(out_file_name, '\n') = 0;
-        out_file=fopen(out_file_name,"w");
-        temp=head->first;
-        while(temp!=head->last){
-            fprintf(out_file,"%s;%s;%d;%.2f;%.2f;%.2f;%.2f\n",temp->name,temp->type,temp->weight,temp->calories,temp->micro[0],temp->micro[1],temp->micro[2]);
-            temp=temp->next;
+        out_file = fopen(out_file_name, "w");// открываем файл для записи
+        temp = head->first;
+        while (temp != head->last) {// пока не конеч списка заносим данные с узлов
+            fprintf(out_file, "%s;%s;%d;%.2f;%.2f;%.2f;%.2f\n", temp->name, temp->type, temp->weight, temp->calories,
+                    temp->micro[0], temp->micro[1], temp->micro[2]);
+            temp = temp->next;
         }
-        fprintf(out_file,"%s;%s;%d;%.2f;%.2f;%.2f;%.2f\n",temp->name,temp->type,temp->weight,temp->calories,temp->micro[0],temp->micro[1],temp->micro[2]);
+        fprintf(out_file, "%s;%s;%d;%.2f;%.2f;%.2f;%.2f\n", temp->name, temp->type, temp->weight, temp->calories,
+                temp->micro[0], temp->micro[1], temp->micro[2]);
         fclose(out_file);
     }
 }
